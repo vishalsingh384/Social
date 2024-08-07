@@ -1,0 +1,84 @@
+.register {
+    height: 100vh;
+    background-color: rgb(202, 179, 248);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .card {
+        width: 50%;
+        display: flex;
+        flex-direction: row-reverse;
+        background-color: white;
+        border-radius: 6px;
+        min-height: 400px;
+        overflow: hidden;
+        .left {
+            flex: 1;
+            background: linear-gradient(rgba(81, 71, 100, 0.459), rgba(63, 49, 88, 0.877)), url("https://images.pexels.com/photos/139303/pexels-photo-139303.jpeg?auto=compress&cs=tinysrgb&w=600") center;
+            background-size:cover;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            color: white;
+            h1 {
+                font-size: 55px;
+                line-height: 50px;
+            }
+
+            p {
+                font-size: 12px;
+            }
+
+            span {
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+            button {
+                width: 50%; 
+                padding: 7px;
+                border: none;
+                border-radius: 2px;
+                background-color: white;
+                color: rgb(107, 74, 141);
+                font-weight: bold;
+                cursor: pointer;
+            }
+        }
+
+        .right {
+            flex: 1;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: center;
+            h1 {
+                color: #555;
+            }
+
+            form {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                input {
+                    border: none;
+                    border-bottom: 1px solid lightgray;
+                    padding: 20px 10px;
+                }
+
+                button {
+                    width: 50%;
+                    padding: 10px;
+                    border: none;
+                    background-color: #938eef;
+                    color: white;
+                    font-weight: bold;
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+}
