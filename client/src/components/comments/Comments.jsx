@@ -1,48 +1,58 @@
 import './comments.scss';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { AuthContext } from '../../context/authContext';
+import moment from 'moment';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { makeRequest } from '../../axios';
 
-const Comments = () => {
+const Comments = ({ postId }) => {
 
-    const {currentUser}=useContext(AuthContext);
+    const queryClient = useQueryClient();
+    const { currentUser } = useContext(AuthContext);
+    const [comment, setComment] = useState("");
 
-    const comments=[
-        {
-            id:4,
-            name:"Dua Lipa",
-            userId:1,
-            profilePic:"https://images.pexels.com/photos/307847/pexels-photo-307847.jpeg?auto=compress&cs=tinysrgb&w=600",
-            desc:"lorem asdkfuhiodrvf iosrf fnwe foiwq efoquwernfpqwef",
-            img:"https://images.pexels.com/photos/307847/pexels-photo-307847.jpeg?auto=compress&cs=tinysrgb&w=600"
+    const { isPending, error, data } = useQuery({
+        queryKey: ['comments', postId],
+        queryFn: () =>
+            makeRequest.get("/comments?postId=" + postId).then((res) => {
+                return res.data;
+            })
+    });
+
+
+    const mutation = useMutation({
+        mutationFn: (newComment) => { return makeRequest.post('/comments', newComment) },
+        onSuccess: () => {
+            // Invalidate and refetch
+            queryClient.invalidateQueries({ queryKey: ['comments'] }) //basically for instantly fetching data again of key=posts
         },
-        {
-          id:5,
-          name:"Beyonce",
-          userId:2,
-          profilePic:"https://images.pexels.com/photos/307847/pexels-photo-307847.jpeg?auto=compress&cs=tinysrgb&w=600",
-          desc:"lorem asdkfuhiodrvf iosrf fnwe foiwq efoquwernfpqwef",
-          img:"https://images.pexels.com/photos/307847/pexels-photo-307847.jpeg?auto=compress&cs=tinysrgb&w=600"
-      }
-    ]
-  return (
-    <div className="comments">
-        <div className="write">
-            <img src={currentUser.profilePic} alt="" />
-            <input type="text" placeholder='write a comment'/>
-            <button>Send</button>
-        </div>
-        {comments.map((comment)=>(
-            <div className="comment">
-                <img src={comment.profilePic} alt="" />
-                <div className="info">
-                    <span>{comment.name}</span>
-                    <p>{comment.desc}</p>
-                </div>
-                <span className='date'>1 hour ago</span>
+    });
+
+    const handleClick = async (e) => {
+        e.preventDefault();
+        mutation.mutate({ comment, postId });
+        setComment("");
+    }    
+
+    return (
+        <div className="comments">
+            <div className="write">
+                <img src={currentUser.profilePic} alt="" />
+                <input type="text" placeholder='write a comment' value={comment} onChange={(e) => setComment(e.target.value)} />
+                <button onClick={handleClick}>Send</button>
             </div>
-        ))}
-    </div>
-  )
+            {isPending ? "Loading Comments" : data.map((comment) => (
+                <div className="comment" key={comment.id}>
+                    <img src={comment.profilePic} alt="" />
+                    <div className="info">
+                        <span>{comment.name}</span>
+                        <p>{comment.desc}</p>
+                    </div>
+                    <span className='date'>{moment(comment.createdAt).fromNow()}</span>
+                </div>
+            ))}
+        </div>
+    )
 }
 
 export default Comments

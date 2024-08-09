@@ -11,19 +11,16 @@ const Posts = () => {
       makeRequest.get("/posts").then((res) => {
         return res.data;
       })
-  })
-
-  console.log(data);
+  });
   
-
   return (
     <div className='posts'>
       {
-      error?"Something went wrong":
-      isPending?'Loading posts':
-      data.map(post => (
-        <Post post={post} key={post.id} />
-      ))}
+        error ? "Something went wrong" :
+          isPending ? 'Loading posts' :
+            data.map(post => (
+              <Post post={post} key={post.id} />
+            ))}
     </div>
   )
 }

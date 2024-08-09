@@ -5,14 +5,45 @@ import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import Comments from '../comments/Comments';
+import moment from 'moment';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { makeRequest } from '../../axios';
+import { AuthContext } from '../../context/authContext';
 
 const Post = ({ post }) => {
-
     const [commentOpen, setCommentOpen] = useState(false);
-    //temporary
-    const liked = false;
+    const {currentUser}=useContext(AuthContext);
+    const liked=true;    
+
+    const queryClient = useQueryClient();
+
+    const { isPending, error, data } = useQuery({
+        queryKey: ['likes', post.id],
+        queryFn: () =>
+            makeRequest.get("/likes?postId=" + post.id).then((res) => {
+                return res.data;
+            })
+    });
+
+
+    const mutation = useMutation({
+        mutationFn: (liked) => {
+            if (liked) { return makeRequest.delete('/likes?postId='+post.id) }
+            else { return makeRequest.post('/likes', {postId:post.id}) }
+        },
+        onSuccess: () => {
+            // Invalidate and refetch
+            queryClient.invalidateQueries({ queryKey: ['likes'] }) //basically for instantly fetching data again of key=posts
+        },
+    });
+
+    const handleClick=(e)=>{
+        e.preventDefault();
+        mutation.mutate(data.includes(currentUser.id));
+    }    
+
     return (
         <div className="post">
             <div className="container">
@@ -26,21 +57,22 @@ const Post = ({ post }) => {
                             >
                                 <span className="name">{post.name}</span>
                             </Link>
-                            <span className="date">1 decade ago</span>
+                            <span className="date">{moment(post.createdAt).fromNow()}</span>
                         </div>
                     </div>
                     <MoreHorizIcon />
                 </div>
                 <div className="content">
                     <p>{post.desc}</p>
-                    <img src={post.img} alt="" />
+                    <img src={'../uploads/' + post.img} alt="" />
+                    {/*files in the public directory are served at the root path.*/}
                 </div>
                 <div className="info">
                     <div className="item">
-                        {liked ? <FavoriteOutlinedIcon /> : <FavoriteBorderOutlinedIcon />}
-                        12 Likes
+                        {isPending?"Loading":data.includes(currentUser.id)?<FavoriteOutlinedIcon style={{ color: "red" }} onClick={handleClick} /> :<FavoriteBorderOutlinedIcon onClick={handleClick} />}
+                        {data?.length} Likes
                     </div>
-                    <div className="item" onClick={()=>setCommentOpen(prev=>!prev)}>
+                    <div className="item" onClick={() => setCommentOpen(prev => !prev)}>
                         <TextsmsOutlinedIcon />
                         12 Comments
                     </div>
@@ -49,7 +81,7 @@ const Post = ({ post }) => {
                         Share
                     </div>
                 </div>
-                {commentOpen&&<Comments/>}
+                {commentOpen && <Comments postId={post.id} />}
             </div>
         </div>
     )

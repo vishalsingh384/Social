@@ -13,7 +13,6 @@ const stories=[
 const Stories = () => {
 
     const {currentUser}=useContext(AuthContext);
-    console.log(currentUser);
     
   return (
     <div className='stories'>
