@@ -14,20 +14,12 @@ import { AuthContext } from '../../context/authContext';
 
 const Post = ({ post }) => {
     const [commentOpen, setCommentOpen] = useState(false);
+    const [menuOpen, setMenuOpen]=useState(false);
+
     const {currentUser}=useContext(AuthContext);
     const liked=true;    
 
     const queryClient = useQueryClient();
-
-    const { isPending, error, data } = useQuery({
-        queryKey: ['likes', post.id],
-        queryFn: () =>
-            makeRequest.get("/likes?postId=" + post.id).then((res) => {
-                return res.data;
-            })
-    });
-
-
     const mutation = useMutation({
         mutationFn: (liked) => {
             if (liked) { return makeRequest.delete('/likes?postId='+post.id) }
@@ -39,10 +31,33 @@ const Post = ({ post }) => {
         },
     });
 
+    const deletePostMutation = useMutation({
+        mutationFn: (postId) => {
+            return makeRequest.delete('/posts/'+postId)
+        },
+        onSuccess: () => {
+            // Invalidate and refetch
+            queryClient.invalidateQueries({ queryKey: ['posts'] }) //basically for instantly fetching data again of key=posts
+        },
+    });
+    
+    const { isPending, error, data } = useQuery({
+        queryKey: ['likes', post.id],
+        queryFn: () =>
+            makeRequest.get("/likes?postId=" + post.id).then((res) => {
+                return res.data;
+            })
+    });
+
     const handleClick=(e)=>{
         e.preventDefault();
         mutation.mutate(data.includes(currentUser.id));
-    }    
+    }
+
+    const handleDelete=(e)=>{
+        e.preventDefault();
+        deletePostMutation.mutate(post.id)
+    }
 
     return (
         <div className="post">
@@ -60,7 +75,8 @@ const Post = ({ post }) => {
                             <span className="date">{moment(post.createdAt).fromNow()}</span>
                         </div>
                     </div>
-                    <MoreHorizIcon />
+                    <MoreHorizIcon onClick={()=>setMenuOpen(!menuOpen)}/>
+                    {menuOpen&&post.userId==currentUser.id&&<button onClick={handleDelete}>Delete</button>}
                 </div>
                 <div className="content">
                     <p>{post.desc}</p>

@@ -3,6 +3,8 @@ import authRoutes from './routes/auth.js';
 import postRoutes from './routes/posts.js';
 import commentRoutes from './routes/comments.js';
 import likeRoutes from './routes/likes.js';
+import userRoutes from './routes/users.js';
+import relRoutes from './routes/relationships.js';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -33,6 +35,7 @@ const storage = multer.diskStorage({
   })
 
 const upload=multer({storage:storage});
+console.log(upload);
 
 app.post("/api/upload", upload.single("file"), (req,res)=>{
     const file=req.file;
@@ -44,6 +47,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/likes", likeRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/relationship", relRoutes);
 app.use("/*",(req,res)=>{
     res.status(500).json("endpoint not found");
 })
