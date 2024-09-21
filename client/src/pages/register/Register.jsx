@@ -22,7 +22,7 @@ const Register = () => {
     const handleSubmit=async(e)=>{
         e.preventDefault();
         try {
-            await axios.post("http://localhost:8800/api/auth/register", inputs);
+            await axios.post("https://unsocial.onrender.com/api/auth/register", inputs);
         } catch (error) {
             console.log(error);
             setErr(error.response.data);
