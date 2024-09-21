@@ -17,6 +17,8 @@ import { AuthContext } from './context/authContext';
 function App() {
 
   const { currentUser } = useContext(AuthContext);
+  console.log(currentUser);
+  
   const queryClient = new QueryClient();
 
   const Layout = () => {
