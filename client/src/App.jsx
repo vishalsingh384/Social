@@ -8,23 +8,21 @@ import RightBar from './components/rightBar/RightBar';
 import Home from './pages/home/Home';
 import Profile from './pages/profile/Profile';
 import { useContext, useEffect, useState } from 'react';
-import { DarkModeContext } from './context/darkModeContext';
 import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
+import { AuthContext } from './context/authContext';
 
 function App() {
 
-  const currentUser = true;
-
-  const { darkMode } = useContext(DarkModeContext);
-  const queryClient=new QueryClient();
+  const { currentUser } = useContext(AuthContext);
+  const queryClient = new QueryClient();
 
   const Layout = () => {
     return (
       <QueryClientProvider client={queryClient}>
-        <div className={`theme-${darkMode ? "dark" : "light"}`}>
+        <div>
           <NavBar />
           <div style={{ display: "flex" }}>
             <LeftBar />
@@ -42,14 +40,14 @@ function App() {
 
     if (!currentUser) {
       return <Navigate to="/login" />
-    }
+    }    
 
     return children;
   }
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <ProtectedRoute><Layout /></ProtectedRoute>,
+      element: <ProtectedRoute><Layout/></ProtectedRoute>,
       children: [
         {
           path: "/",
@@ -69,10 +67,13 @@ function App() {
       path: "/register",
       element: <Register />
     }
-  ])
-  return <div>
-    <RouterProvider router={router} />
-  </div>;
+  ]);
+
+  return (
+    <div>
+      <RouterProvider router={router} />
+    </div>
+  )
 }
 
 export default App;

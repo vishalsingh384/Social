@@ -1,20 +1,27 @@
 import React, { useContext } from 'react';
 import './navBar.scss';
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import WbSunnyOutlinedIcon from "@mui/icons-material/WbSunnyOutlined";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import { Link } from 'react-router-dom';
-import { DarkModeContext } from '../../context/darkModeContext';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/authContext';
 
 const NavBar = () => {
-    const { toggle, darkMode } = useContext(DarkModeContext);
-    const{currentUser}=useContext(AuthContext);
+    const { currentUser, logout } = useContext(AuthContext);
+    const navigate=useNavigate();
+
+    const handleClick=async(e)=>{
+        e.preventDefault();
+        try {
+            await logout();
+            navigate("/login");
+        } catch (error) {
+            alert(error.message);
+        } 
+    }
 
     return (
         <div className='navbar'>
@@ -23,7 +30,6 @@ const NavBar = () => {
                     <span>Social Media</span>
                 </Link>
                 <HomeOutlinedIcon />
-                {darkMode?<WbSunnyOutlinedIcon onClick={toggle}/>:<DarkModeOutlinedIcon onClick={toggle} />}
                 <GridViewOutlinedIcon />
                 <div className="search">
                     <SearchOutlinedIcon />
@@ -35,8 +41,10 @@ const NavBar = () => {
                 <EmailOutlinedIcon />
                 <NotificationsOutlinedIcon />
                 <div className='user'>
-                    <img src={currentUser.profilePic} alt='' />
-                    <span>{currentUser.name}</span>
+                    <Link to={'/profile/' + currentUser.id} style={{ textDecoration: "none", color: 'black' }}>
+                        <img src={'../uploads/' + currentUser.profilePic} alt='' />
+                    </Link>
+                    <button onClick={handleClick}>Logout</button>
                 </div>
             </div>
         </div>

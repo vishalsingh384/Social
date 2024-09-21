@@ -3,7 +3,7 @@ import Post from '../post/Post'
 import { useQuery } from '@tanstack/react-query'
 import { makeRequest } from '../../axios';
 
-const Posts = ({userId}) => {
+const Posts = ({userId}) => {  
   
   const { isPending, error, data } = useQuery({
     queryKey: ['posts'],
@@ -19,7 +19,7 @@ const Posts = ({userId}) => {
         error ? "Something went wrong" :
           isPending ? 'Loading posts' :
             data.map(post => (
-              <Post post={post} />
+              <Post post={post} key={post.id}/>
             ))}
     </div>
   )

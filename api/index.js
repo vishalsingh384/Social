@@ -35,11 +35,9 @@ const storage = multer.diskStorage({
   })
 
 const upload=multer({storage:storage});
-console.log(upload);
 
 app.post("/api/upload", upload.single("file"), (req,res)=>{
     const file=req.file;
-    console.log(file);
     return res.status(200).json(file.filename);
 });
 
@@ -53,6 +51,7 @@ app.use("/*",(req,res)=>{
     res.status(500).json("endpoint not found");
 })
 
-app.listen(8800,()=>{
+const port=process.env.PORT||8800;
+app.listen(port,()=>{
     console.log("server is listening");
 })

@@ -1,11 +1,14 @@
 import "./update.scss";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { makeRequest } from "../../axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { AuthContext } from "../../context/authContext";
 
 const Update = ({ setUpdateOpen, user }) => {
-    
+
+  const {logout}=useContext(AuthContext);
+
   const [cover, setCover] = useState(null);
   const [profile, setProfile] = useState(null);
   const [texts, setTexts] = useState({
@@ -16,7 +19,6 @@ const Update = ({ setUpdateOpen, user }) => {
   });
 
   const upload = async (file) => {
-    console.log(file)
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -34,20 +36,20 @@ const Update = ({ setUpdateOpen, user }) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-      mutationFn: (user) => {
-          return makeRequest.put('/user', user)
-      },
-      onSuccess: () => {
-          // Invalidate and refetch
-          queryClient.invalidateQueries({ queryKey: ['user'] }) //basically for instantly fetching data again of key=posts
-      },
+    mutationFn: (user) => {
+      return makeRequest.put('/user', user)
+    },
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['user'] }) //basically for instantly fetching data again of key=posts
+    },
   });
 
   const handleClick = async (e) => {
     e.preventDefault();
 
     //TODO: find a better way to get image URL
-    
+
     let coverUrl;
     let profileUrl;
 
@@ -57,6 +59,9 @@ const Update = ({ setUpdateOpen, user }) => {
     setUpdateOpen(false);
     setCover(null);
     setProfile(null);
+    setTimeout(async()=>{
+      await logout();
+    },2000)
   }
 
   return (
@@ -68,7 +73,7 @@ const Update = ({ setUpdateOpen, user }) => {
             <label htmlFor="cover">
               <span>Cover Picture</span>
               <div className="imgContainer">
-                <img src={ cover ? URL.createObjectURL(cover) : "/upload/" + user.coverPic} alt=""/>
+                <img src={cover ? URL.createObjectURL(cover) : "/upload/" + user.coverPic} alt="" />
                 <CloudUploadIcon className="icon" />
               </div>
             </label>
@@ -81,9 +86,7 @@ const Update = ({ setUpdateOpen, user }) => {
             <label htmlFor="profile">
               <span>Profile Picture</span>
               <div className="imgContainer">
-                <img
-                  src={
-                    profile
+                <img src={ profile
                       ? URL.createObjectURL(profile)
                       : "/upload/" + user.profilePic
                   }

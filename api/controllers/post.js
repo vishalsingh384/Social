@@ -3,7 +3,9 @@ import { db } from "../connect.js";
 import jwt from 'jsonwebtoken';
 export const getPosts = (req, res) => {
 
-    const userId=req.query.userId;    
+    const userId=req.query.userId;
+    // console.log(userId);
+      
 
     const token = req.cookies.accessToken;
     if (!token) return res.status(401).json("Not logged in");
@@ -30,8 +32,6 @@ export const addPost = (req, res) => {
         if (err) res.status(403).json("Token is not valid");
 
         const q = "INSERT INTO posts(`desc`,`img`,`createdAt`,`userId`) VALUES (?)";
-        console.log(req.body.desc);
-        console.log(req.body.img);
         
         
         const values=[
@@ -43,7 +43,7 @@ export const addPost = (req, res) => {
 
         db.query(q, [values], (err, data) => {
             if (err) return res.status(500).json(err);
-            return res.status(200).json("POst created");
+            return res.status(200).json("Post created");
         })
     })
 }
@@ -54,7 +54,6 @@ export const deletePost = (req, res) => {
 
     jwt.verify(token, process.env.secretKey, (err, userInfo) => {
         if (err) res.status(403).json("Token is not valid");
-        console.log(req.params.id);
 
         const q = "DELETE FROM posts WHERE `id`=? AND `userId`=?";
 

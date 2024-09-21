@@ -20,6 +20,7 @@ const Post = ({ post }) => {
     const liked=true;    
 
     const queryClient = useQueryClient();
+
     const mutation = useMutation({
         mutationFn: (liked) => {
             if (liked) { return makeRequest.delete('/likes?postId='+post.id) }
@@ -41,6 +42,7 @@ const Post = ({ post }) => {
         },
     });
     
+
     const { isPending, error, data } = useQuery({
         queryKey: ['likes', post.id],
         queryFn: () =>
@@ -64,7 +66,7 @@ const Post = ({ post }) => {
             <div className="container">
                 <div className="user">
                     <div className="userInfo">
-                        <img src={post.profilePic} alt="" />
+                        <img src={'../uploads/'+post.profilePic} alt="" />
                         <div className="details">
                             <Link
                                 to={`/profile/${post.userId}`}
@@ -90,14 +92,14 @@ const Post = ({ post }) => {
                     </div>
                     <div className="item" onClick={() => setCommentOpen(prev => !prev)}>
                         <TextsmsOutlinedIcon />
-                        12 Comments
+                        {commentOpen?"Hide Comments":"See Comments"}
                     </div>
                     <div className="item">
                         <ShareOutlinedIcon />
                         Share
                     </div>
                 </div>
-                {commentOpen && <Comments postId={post.id} />}
+                {commentOpen && <Comments postId={post.id}/>}
             </div>
         </div>
     )

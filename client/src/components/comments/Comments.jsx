@@ -5,7 +5,7 @@ import moment from 'moment';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { makeRequest } from '../../axios';
 
-const Comments = ({ postId }) => {
+const Comments = ({ postId}) => {
 
     const queryClient = useQueryClient();
     const { currentUser } = useContext(AuthContext);
@@ -32,25 +32,31 @@ const Comments = ({ postId }) => {
         e.preventDefault();
         mutation.mutate({ comment, postId });
         setComment("");
-    }    
+    }
 
     return (
         <div className="comments">
             <div className="write">
-                <img src={currentUser.profilePic} alt="" />
+                <img src={'../uploads/' + currentUser.profilePic} alt="" />
                 <input type="text" placeholder='write a comment' value={comment} onChange={(e) => setComment(e.target.value)} />
                 <button onClick={handleClick}>Send</button>
             </div>
-            {isPending ? "Loading Comments" : data.map((comment) => (
-                <div className="comment" key={comment.id}>
-                    <img src={comment.profilePic} alt="" />
-                    <div className="info">
-                        <span>{comment.name}</span>
-                        <p>{comment.desc}</p>
-                    </div>
-                    <span className='date'>{moment(comment.createdAt).fromNow()}</span>
-                </div>
-            ))}
+            {error
+                ? "Something went wrong"
+                : isPending
+                    ? "loading"
+                    :  
+                    data.map((comment) => (
+                        <div className="comment" key={comment.id}>
+                            <img src={'../uploads/' + comment.profilePic} alt="" />
+                            <div className="info">
+                                <span>{comment.name}</span>
+                                <p>{comment.desc}</p>
+                            </div>
+                            <span className='date'>{moment(comment.createdAt).fromNow()}</span>
+                        </div>
+                    ))
+            }
         </div>
     )
 }
