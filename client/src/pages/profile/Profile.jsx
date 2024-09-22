@@ -54,6 +54,7 @@ const Profile = () => {
   
 
   const handleFollow = async (e) => {
+    e.preventDefault();
     mutation.mutate(rData.includes(currentUser.id));
   }
 

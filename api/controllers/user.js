@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 export const getUser=(req,res)=>{
     const q="SELECT * from users WHERE id=(?)";
     db.query(q,[req.params.id],(err,data)=>{
-        if(err||data.length<1) return res.status(500).json(err);
+        if(err) return res.status(500).json(err);
         const {password, ...others}=data[0];
         return res.json(others);
     }) 
